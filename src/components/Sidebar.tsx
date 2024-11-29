@@ -1,9 +1,10 @@
-import { LogOut, LayoutDashboard, ListPlus, Landmark, ClipboardPlus, Link } from 'lucide-react';
+import { LogOut, LayoutDashboard, ListPlus, Landmark, ClipboardPlus, CircleUserRound, Link } from 'lucide-react';
 
 interface SidebarProps {
-  currentView: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard';
-  onViewChange: (view: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard') => void;
+  currentView: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard' | 'admin';
+  onViewChange: (view: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard' | 'admin') => void;
   onLogout: () => void;  // Add onLogout function prop
+  isAdminLoggedIn: boolean;  // Track if the user is logged in as an admin
 }
 
 const navItems = [
@@ -14,7 +15,7 @@ const navItems = [
   { icon: ClipboardPlus, label: 'Report', view: 'reports' as const },
 ];
 
-export function Sidebar({ currentView, onViewChange, onLogout }: SidebarProps) {
+export function Sidebar({ currentView, onViewChange, onLogout, isAdminLoggedIn }: SidebarProps) {
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 text-gray-900 p-4 flex flex-col">
       <div className="mb-8">
@@ -38,6 +39,23 @@ export function Sidebar({ currentView, onViewChange, onLogout }: SidebarProps) {
               </button>
             </li>
           ))}
+
+          {/* Render Admin Tab only if the user is logged in as admin */}
+          {isAdminLoggedIn && (
+            <li>
+              <button
+                onClick={() => onViewChange('admin')}
+                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'admin'
+                    ? 'bg-blue-50 text-gray-800'
+                    : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <CircleUserRound className="w-5 h-5" />
+                <span>Admin</span>
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
 

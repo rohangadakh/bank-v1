@@ -3,7 +3,11 @@ import { Trash2 } from "lucide-react";
 import { ref, set, get, update } from "firebase/database";
 import { database } from "./firebase"; // Import the initialized database
 
-const Deposit: React.FC = () => {
+interface DepositProps {
+  accessType: string;  // Access type (readonly or readwrite)
+}
+
+const Deposit: React.FC<DepositProps> = ({ accessType }) => {
   const [banks, setBanks] = useState<any[]>([]);
   const [sites, setSites] = useState<any[]>([]);
   const [actionType, setActionType] = useState("deposit"); // For deposit or withdraw
@@ -93,6 +97,10 @@ const Deposit: React.FC = () => {
 
   // Handle Form Submit
   const handleSubmit = () => {
+    if (accessType === "readonly") {
+      alert("You do not have permission to make deposits.");
+      return;
+    }
     const { name, amount, utr, bank, site, remark, date } = depositData;
 
     // Check if all required fields are filled
@@ -322,12 +330,13 @@ const Deposit: React.FC = () => {
         </div>
 
         <div className="mt-4 text-center">
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-600 text-white font-bold py-2 px-6 rounded-xl hover:bg-blue-700 transition duration-300"
-          >
-            Submit
-          </button>
+        <button
+        onClick={handleSubmit}
+        disabled={accessType === "readonly"}
+        className={`bg-blue-500 text-white px-4 py-2 rounded-xl ${accessType === "readonly" ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"}`}
+      >
+        Submit
+      </button>
         </div>
       </div>
 

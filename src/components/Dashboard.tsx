@@ -3,6 +3,8 @@ import { ref, get } from "firebase/database";
 import { database } from "./firebase";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -23,12 +25,17 @@ const Dashboard: React.FC = () => {
     totalDeposit: 0,
     totalWithdraw: 0,
     currentBalance: 0,
+    totalInitialBalance: 0,  // New card for Initial Balance
+    currentBalanceMistakeBonus: 0, // New card for Mistake Bonus
+    totalDeposits: 0, // New card for Total Deposits
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-
   const [bankData, setBankData] = useState<any>({});
   const [siteData, setSiteData] = useState<any>({});
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   // Fetch data from the database
   const fetchData = () => {
@@ -50,24 +57,39 @@ const Dashboard: React.FC = () => {
           // Sort transactions by timestamp (most recent first)
           transactionList.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
+          // Filter transactions by the selected date range
+          const filteredTransactions = transactionList.filter((transaction) => {
+            const transactionDate = new Date(transaction.date);
+            return (
+              (!startDate || transactionDate >= startDate) &&
+              (!endDate || transactionDate <= endDate)
+            );
+          });
+
           // Calculate statistics
-          const totalDeposit = transactionList
+          const totalDeposit = filteredTransactions
             .filter((transaction) => transaction.actionType === "deposit")
             .reduce((acc, curr) => acc + curr.amount, 0);
 
-          const totalWithdraw = transactionList
+          const totalWithdraw = filteredTransactions
             .filter((transaction) => transaction.actionType === "withdraw")
             .reduce((acc, curr) => acc + curr.amount, 0);
 
+          const totalDeposits = filteredTransactions
+            .filter((transaction) => transaction.actionType === "deposit")
+            .length;
+
           const currentBalance = totalDeposit - totalWithdraw;
+          const totalInitialBalance = 100000; // Example initial balance, this should come from your data
+          const currentBalanceMistakeBonus = 5000; // Example bonus, should also be dynamic
 
           // Aggregate data for graphs
-          const bankWise = transactionList.reduce<Record<string, number>>((acc, curr) => {
+          const bankWise = filteredTransactions.reduce<Record<string, number>>((acc, curr) => {
             acc[curr.bankName] = (acc[curr.bankName] || 0) + curr.amount;
             return acc;
           }, {});
 
-          const siteWise = transactionList.reduce<Record<string, number>>((acc, curr) => {
+          const siteWise = filteredTransactions.reduce<Record<string, number>>((acc, curr) => {
             acc[curr.site] = (acc[curr.site] || 0) + curr.amount;
             return acc;
           }, {});
@@ -76,8 +98,11 @@ const Dashboard: React.FC = () => {
             totalDeposit,
             totalWithdraw,
             currentBalance,
+            totalInitialBalance,
+            currentBalanceMistakeBonus,
+            totalDeposits,
           });
-          setTransactions(transactionList);
+          setTransactions(filteredTransactions);
 
           // Prepare data for graphs
           setBankData({
@@ -110,12 +135,41 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [startDate, endDate]);  // Re-fetch data whenever the date range changes
 
   return (
     <div className="p-6 space-y-6">
+      {/* Date Range Picker */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-gray-700">Select Date Range</h2>
+        <div className="flex space-x-4">
+          <DatePicker
+            selected={startDate}
+            onChange={(date: Date | null) => setStartDate(date)} // Handle Date | null
+            placeholderText="Start Date"
+            className="p-2 border rounded"
+            dateFormat="dd/MM/yyyy" // Your desired date format
+          />
+
+          <DatePicker
+            selected={endDate}
+            onChange={(date: Date | null) => setEndDate(date)} // Handle Date | null
+            placeholderText="End Date"
+            className="p-2 border rounded"
+            dateFormat="dd/MM/yyyy" // Your desired date format
+          />
+
+        </div>
+      </div>
+
       {/* Statistic Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white shadow-md rounded-xl p-6 text-center">
+          <h2 className="text-lg font-bold text-gray-700">Total Initial Balance</h2>
+          <p className="text-2xl font-extrabold text-gray-700 mt-2">
+            ₹{statistics.totalInitialBalance.toLocaleString()}
+          </p>
+        </div>
         <div className="bg-white shadow-md rounded-xl p-6 text-center">
           <h2 className="text-lg font-bold text-gray-700">Total Deposit</h2>
           <p className="text-2xl font-extrabold text-blue-600 mt-2">
@@ -128,6 +182,18 @@ const Dashboard: React.FC = () => {
             ₹{statistics.totalWithdraw.toLocaleString()}
           </p>
         </div>
+        <div className="bg-white shadow-md rounded-xl p-6 text-center">
+          <h2 className="text-lg font-bold text-gray-700">Mistakes</h2>// need to change for mistakes
+          <p className="text-2xl font-extrabold text-yellow-600 mt-2">
+            ₹{statistics.currentBalanceMistakeBonus.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-white shadow-md rounded-xl p-6 text-center">
+          <h2 className="text-lg font-bold text-gray-700">Bonus</h2> // need to change for bonus
+          <p className="text-2xl font-extrabold text-green-600 mt-2">
+            {statistics.totalDeposits} 
+          </p>
+        </div> 
         <div className="bg-white shadow-md rounded-xl p-6 text-center">
           <h2 className="text-lg font-bold text-gray-700">Current Balance</h2>
           <p className="text-2xl font-extrabold text-purple-600 mt-2">

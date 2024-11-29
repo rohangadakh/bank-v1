@@ -5,21 +5,36 @@ import { database } from "./firebase"; // Import the initialized database
 
 const Bank: React.FC = () => {
   const [bankName, setBankName] = useState<string>("");
+  const [initialBalance, setInitialBalance] = useState<string>(""); // Initial balance as a string
   const [banks, setBanks] = useState<any[]>([]);
 
   // Add Bank Functionality
   const handleSubmit = () => {
-    if (bankName.trim() !== "") {
+    if (bankName.trim() !== "" && initialBalance.trim() !== "") {
       const newBankRef = ref(database, "banks/" + bankName);
-      set(newBankRef, { name: bankName })
+
+      // Convert `initialBalance` to a number safely
+      const balance = parseFloat(initialBalance);
+      if (isNaN(balance)) {
+        alert("Please enter a valid number for Initial Balance!");
+        return;
+      }
+
+      set(newBankRef, {
+        name: bankName,
+        initialBalance: balance, // Store in 'initialBalance' field
+      })
         .then(() => {
           console.log("Bank added successfully");
           setBankName(""); // Clear the input field
-          fetchBanks();  // Refresh the list of banks
+          setInitialBalance(""); // Clear the balance input
+          fetchBanks(); // Refresh the list of banks
         })
         .catch((error) => {
           console.error("Error adding bank: ", error);
         });
+    } else {
+      alert("Please enter both Bank Name and Initial Balance!");
     }
   };
 
@@ -33,9 +48,10 @@ const Bank: React.FC = () => {
           const bankArray = Object.keys(banksData).map((key, index) => ({
             id: key,
             name: banksData[key].name,
+            initialBalance: banksData[key].initialBalance || 0, // Include initialBalance
             srNo: index + 1,
           }));
-          setBanks(bankArray);  // Update the banks state
+          setBanks(bankArray); // Update the banks state
         } else {
           console.log("No data available");
         }
@@ -51,7 +67,7 @@ const Bank: React.FC = () => {
     remove(bankRef)
       .then(() => {
         console.log("Bank deleted successfully");
-        fetchBanks();  // Refresh the list after deletion
+        fetchBanks(); // Refresh the list after deletion
       })
       .catch((error) => {
         console.error("Error deleting bank: ", error);
@@ -68,14 +84,23 @@ const Bank: React.FC = () => {
       {/* Add Bank Card */}
       <div className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-xl font-bold mb-4">Add Bank</h2>
-        <div className="flex items-center space-x-4">
+        <div className="grid grid-cols-2 gap-4">
           <input
             type="text"
             value={bankName}
             onChange={(e) => setBankName(e.target.value)}
-            placeholder="Enter Bank name"
-            className="flex-1 border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter Bank Name"
+            className="border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <input
+            type="number"
+            value={initialBalance}
+            onChange={(e) => setInitialBalance(e.target.value)} // Keep as a string
+            placeholder="Enter Initial Balance"
+            className="border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="mt-4">
           <button
             onClick={handleSubmit}
             className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 flex items-center space-x-2"
@@ -95,6 +120,7 @@ const Bank: React.FC = () => {
               <tr className="bg-gray-100 border-b">
                 <th className="border-r border-gray-300 px-4 py-2 text-left">S.No</th>
                 <th className="border-r border-gray-300 px-4 py-2 text-left">Bank Name</th>
+                <th className="border-r border-gray-300 px-4 py-2 text-left">Initial Balance</th>
                 <th className="border- border-gray-300 px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
@@ -103,6 +129,7 @@ const Bank: React.FC = () => {
                 <tr key={bank.id}>
                   <td className="border-r border-gray-300 px-4 py-2">{bank.srNo}</td>
                   <td className="border-r border-gray-300 px-4 py-2">{bank.name}</td>
+                  <td className="border-r border-gray-300 px-4 py-2">{bank.initialBalance}</td>
                   <td className="px-4 py-2 flex space-x-2">
                     <button
                       onClick={() => handleDelete(bank.id)}
