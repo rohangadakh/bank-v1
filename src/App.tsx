@@ -8,7 +8,7 @@ import Reports from "./components/Reports";
 import Dashboard from "./components/Dashboard";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'site' | 'bank' | 'deposit' | 'withdraw' | 'reports' | 'dashboard'>('dashboard');
+  const [currentView, setCurrentView] = useState<'site' | 'bank' | 'deposit' | 'reports' | 'dashboard'>('dashboard');
   const [isLoggedIn, setIsLoggedIn] = useState(false);  // Track login state
   const [id, setId] = useState("");  // Track input for ID
   const [password, setPassword] = useState("");  // Track input for Password
@@ -80,7 +80,6 @@ export default function App() {
           {currentView === "site" && <Site />}
           {currentView === "bank" && <Bank />}
           {currentView === "deposit" && <Deposit />}
-          {currentView === "withdraw" && <Withdraw />}
           {currentView === "reports" && <Reports />}
         </div>
       </main>

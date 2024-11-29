@@ -1,8 +1,8 @@
-import { LogOut, LayoutDashboard, ListPlus, Landmark, ListMinus, ClipboardPlus, Link } from 'lucide-react';
+import { LogOut, LayoutDashboard, ListPlus, Landmark, ClipboardPlus, Link } from 'lucide-react';
 
 interface SidebarProps {
-  currentView: 'site' | 'bank' | 'deposit' | 'withdraw' | 'reports' | 'dashboard';
-  onViewChange: (view: 'site' | 'bank' | 'deposit' | 'withdraw' | 'reports' | 'dashboard') => void;
+  currentView: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard';
+  onViewChange: (view: 'site' | 'bank' | 'deposit' | 'reports' | 'dashboard') => void;
   onLogout: () => void;  // Add onLogout function prop
 }
 
@@ -11,7 +11,6 @@ const navItems = [
   { icon: Link, label: 'Site', view: 'site' as const },
   { icon: Landmark, label: 'Bank', view: 'bank' as const },
   { icon: ListPlus, label: 'Deposit', view: 'deposit' as const },
-  { icon: ListMinus, label: 'Withdraw', view: 'withdraw' as const },
   { icon: ClipboardPlus, label: 'Report', view: 'reports' as const },
 ];
 
