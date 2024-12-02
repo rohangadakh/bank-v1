@@ -14,6 +14,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
   const [depositData, setDepositData] = useState({
     name: "",
     amount: 0,
+    bonus: 0, // New bonus field
     utr: "",
     bank: "",
     site: "",
@@ -21,6 +22,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
     date: "",
     actionType: "Deposit",
   });
+
   const [existingDeposits, setExistingDeposits] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState(""); // To hold error message
 
@@ -75,13 +77,14 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
             utr: depositsData[key].utr,
             userName: depositsData[key].name,
             amount: depositsData[key].amount,
+            bonus: depositsData[key].bonus || 0,
             date: depositsData[key].date,
             bank: depositsData[key].bank,
             site: depositsData[key].site,
             remark: depositsData[key].remark,
             actionType: depositsData[key].actionType,
             timestamp: depositsData[key].timestamp,
-          }));
+          }));          
           setExistingDeposits(depositsArray);
         }
       })
@@ -117,6 +120,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
         const actionData = {
           name,
           amount,
+          bonus: depositData.bonus, // Add bonus field here
           utr,
           bank,
           site,
@@ -124,7 +128,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
           date,
           timestamp,
           actionType,
-        };
+        };        
 
         if (actionType === "deposit") {
           // Update bank's total deposit amount
@@ -192,6 +196,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
     setDepositData({
       name: "",
       amount: 0,
+      bonus: 0, // Reset bonus field
       utr: "",
       bank: "",
       site: "",
@@ -200,7 +205,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
       actionType: "Deposit",
     });
     setActionType("deposit");
-  };
+  };  
 
   // Handle Delete
   const handleDelete = (id: string) => {
@@ -327,16 +332,25 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
               className="w-full border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bonus</label>
+            <input
+              type="number"
+              value={depositData.bonus}
+              onChange={(e) => setDepositData({ ...depositData, bonus: Number(e.target.value) })}
+              className="w-full border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
 
         <div className="mt-4 text-center">
-        <button
-        onClick={handleSubmit}
-        disabled={accessType === "readonly"}
-        className={`bg-blue-500 text-white px-4 py-2 rounded-xl ${accessType === "readonly" ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"}`}
-      >
-        Submit
-      </button>
+          <button
+            onClick={handleSubmit}
+            disabled={accessType === "readonly"}
+            className={`bg-blue-500 text-white px-4 py-2 rounded-xl ${accessType === "readonly" ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"}`}
+          >
+            Submit
+          </button>
         </div>
       </div>
 
@@ -352,6 +366,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
                 <th className="border border-gray-300 px-4 py-2">Date</th>
                 <th className="border border-gray-300 px-4 py-2">Amount</th>
                 <th className="border border-gray-300 px-4 py-2">Bank</th>
+                <th className="border border-gray-300 px-4 py-2">Bonus</th>
                 <th className="border border-gray-300 px-4 py-2">Action Type</th>
                 <th className="border border-gray-300 px-4 py-2">Action</th>
               </tr>
@@ -364,6 +379,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
                   <td className="border border-gray-300 px-4 py-2">{deposit.date}</td>
                   <td className="border border-gray-300 px-4 py-2">{deposit.amount}</td>
                   <td className="border border-gray-300 px-4 py-2">{deposit.bank}</td>
+                  <td className="border border-gray-300 px-4 py-2">{deposit.bonus || 0}</td>
                   <td className={`border border-gray-300 px-4 py-2 ${deposit.actionType === 'deposit' ? 'text-white bg-green-500' : 'text-white bg-red-500'}`}>
                     {deposit.actionType.charAt(0).toUpperCase() + deposit.actionType.slice(1)}
                   </td>

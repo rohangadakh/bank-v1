@@ -23,6 +23,7 @@ const Bank: React.FC = () => {
       set(newBankRef, {
         name: bankName,
         initialBalance: balance, // Store in 'initialBalance' field
+        totalAmount: balance, // Add totalAmount field, same as initialBalance
       })
         .then(() => {
           console.log("Bank added successfully");
@@ -49,6 +50,7 @@ const Bank: React.FC = () => {
             id: key,
             name: banksData[key].name,
             initialBalance: banksData[key].initialBalance || 0, // Include initialBalance
+            totalAmount: banksData[key].totalAmount || 0, // Include totalAmount
             srNo: index + 1,
           }));
           setBanks(bankArray); // Update the banks state
@@ -121,6 +123,7 @@ const Bank: React.FC = () => {
                 <th className="border-r border-gray-300 px-4 py-2 text-left">S.No</th>
                 <th className="border-r border-gray-300 px-4 py-2 text-left">Bank Name</th>
                 <th className="border-r border-gray-300 px-4 py-2 text-left">Initial Balance</th>
+                <th className="border-r border-gray-300 px-4 py-2 text-left">Total Amount</th>
                 <th className="border- border-gray-300 px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
@@ -130,6 +133,7 @@ const Bank: React.FC = () => {
                   <td className="border-r border-gray-300 px-4 py-2">{bank.srNo}</td>
                   <td className="border-r border-gray-300 px-4 py-2">{bank.name}</td>
                   <td className="border-r border-gray-300 px-4 py-2">{bank.initialBalance}</td>
+                  <td className="border-r border-gray-300 px-4 py-2">{bank.totalAmount}</td> {/* Display Total Amount */}
                   <td className="px-4 py-2 flex space-x-2">
                     <button
                       onClick={() => handleDelete(bank.id)}

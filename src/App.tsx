@@ -71,7 +71,7 @@ export default function App() {
     }
   }, [userCredentials, loginAttempted, password]);
 
-  if (!isLoggedIn) {
+  if (isLoggedIn) {
     // If not logged in, show the login form
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-200">
