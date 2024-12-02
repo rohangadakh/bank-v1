@@ -33,31 +33,62 @@ export default function App() {
     setLoading(false); // Set loading state to false after fetching data
   };
 
+  useEffect(() => {
+    const savedLoginState = localStorage.getItem("loginState");
+    if (savedLoginState) {
+      const { isLoggedIn, id, isAdmin } = JSON.parse(savedLoginState);
+      setIsLoggedIn(isLoggedIn);
+      setId(id || "");
+      setIsAdminLogin(isAdmin || false);
+    }
+  }, []);
+  
+
   // Handle login form submission
   const handleLogin = async () => {
-    setLoginAttempted(true);  // Mark login as attempted
-    await fetchUserCredentials();
-  };
-
-  // Handle admin login
+    setLoading(true); // Show loading spinner
+    setLoginAttempted(true); // Mark login as attempted
+  
+    await fetchUserCredentials(); // Wait for the credentials to be fetched
+  
+    if (userCredentials) {
+      if (userCredentials.password === password) {
+        setIsLoggedIn(true); // Set login state
+        localStorage.setItem(
+          "loginState",
+          JSON.stringify({ isLoggedIn: true, id, isAdmin: false })
+        );
+      } else {
+        alert("Invalid credentials, please try again.");
+      }
+    }
+  
+    setLoading(false); // Hide loading spinner
+  };  
+  
   const handleAdminLogin = () => {
     if (adminPassword === "d78khjryw") {
       setIsLoggedIn(true);
       setCurrentView("admin");
       setIsAdminLogin(true); // Set admin login state to true
+      localStorage.setItem(
+        "loginState",
+        JSON.stringify({ isLoggedIn: true, isAdmin: true })
+      );
     } else {
       alert("Invalid admin password.");
     }
   };
-
+  
   // Handle logout
   const handleLogout = () => {
-    setIsLoggedIn(false);  // Reset logged in state
-    setId("");  // Clear ID
-    setPassword("");  // Clear Password
-    setUserCredentials(null);  // Clear credentials
+    setIsLoggedIn(false); // Reset logged in state
+    setId(""); // Clear ID
+    setPassword(""); // Clear Password
+    setUserCredentials(null); // Clear credentials
     setIsAdminLogin(false); // Reset admin login state
-  };
+    localStorage.removeItem("loginState"); // Clear local storage
+  };  
 
   // Perform the validation when the user credentials are fetched or login is attempted
   useEffect(() => {
@@ -71,7 +102,7 @@ export default function App() {
     }
   }, [userCredentials, loginAttempted, password]);
 
-  if (isLoggedIn) {
+  if (!isLoggedIn) {
     // If not logged in, show the login form
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-200">
