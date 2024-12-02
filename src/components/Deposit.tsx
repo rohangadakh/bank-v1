@@ -10,6 +10,9 @@ interface DepositProps {
 const Deposit: React.FC<DepositProps> = ({ accessType }) => {
   const [banks, setBanks] = useState<any[]>([]);
   const [sites, setSites] = useState<any[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [depositToDelete, setDepositToDelete] = useState<string | null>(null);
+
   const [actionType, setActionType] = useState("deposit"); // For deposit or withdraw
   const [depositData, setDepositData] = useState({
     name: "",
@@ -84,7 +87,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
             remark: depositsData[key].remark,
             actionType: depositsData[key].actionType,
             timestamp: depositsData[key].timestamp,
-          }));          
+          }));
           setExistingDeposits(depositsArray);
         }
       })
@@ -128,7 +131,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
           date,
           timestamp,
           actionType,
-        };        
+        };
 
         if (actionType === "deposit") {
           // Update bank's total deposit amount
@@ -205,19 +208,33 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
       actionType: "Deposit",
     });
     setActionType("deposit");
-  };  
+  };
 
   // Handle Delete
   const handleDelete = (id: string) => {
-    const depositRef = ref(database, "deposits/" + id);
-    set(depositRef, null)
-      .then(() => {
-        console.log("Deposit deleted successfully");
-        fetchExistingDeposits(); // Refresh the list
-      })
-      .catch((error) => {
-        console.error("Error deleting deposit: ", error);
-      });
+    setDepositToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (depositToDelete) {
+      const depositRef = ref(database, "deposits/" + depositToDelete);
+      set(depositRef, null)
+        .then(() => {
+          console.log("Deposit deleted successfully");
+          fetchExistingDeposits(); // Refresh the list
+          setShowDeleteModal(false); // Close the modal
+          setDepositToDelete(null); // Reset the ID
+        })
+        .catch((error) => {
+          console.error("Error deleting deposit: ", error);
+        });
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDepositToDelete(null);
   };
 
   useEffect(() => {
@@ -343,6 +360,22 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
           </div>
         </div>
 
+        {showDeleteModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <p className="text-lg font-bold mb-4">Are you sure you want to delete this deposit?</p>
+              <div className="flex justify-end space-x-4">
+                <button onClick={cancelDelete} className="px-4 py-2 bg-gray-300 rounded-xl">
+                  Cancel
+                </button>
+                <button onClick={confirmDelete} className="px-4 py-2 bg-red-500 text-white rounded-xl">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 text-center">
           <button
             onClick={handleSubmit}
@@ -390,6 +423,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
                     >
                       <Trash2 size={18} />
                     </button>
+
                   </td>
                 </tr>
               ))}

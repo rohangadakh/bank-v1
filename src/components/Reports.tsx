@@ -210,31 +210,31 @@ const Reports: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr>
-                <th className="border px-4 py-2">Sr. No.</th>
-                <th className="border px-4 py-2">UTR</th>
-                <th className="border px-4 py-2">Action Type</th>
-                <th className="border px-4 py-2">Amount</th>
-                <th className="border px-4 py-2">Bank</th>
-                <th className="border px-4 py-2">Date</th>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Remark</th>
-                <th className="border px-4 py-2">Site</th>
+              <tr className="bg-gray-200">
+                <th className="border border-gray-400 px-4 py-2">Sr. No.</th>
+                <th className="border border-gray-400  px-4 py-2">UTR</th>
+                <th className="border border-gray-400  px-4 py-2">Action Type</th>
+                <th className="border border-gray-400  px-4 py-2">Amount</th>
+                <th className="border border-gray-400  px-4 py-2">Bank</th>
+                <th className="border border-gray-400  px-4 py-2">Date</th>
+                <th className="border border-gray-400  px-4 py-2">Name</th>
+                <th className="border border-gray-400  px-4 py-2">Remark</th>
+                <th className="border border-gray-400  px-4 py-2">Site</th>
               </tr>
             </thead>
             <tbody>
               {filteredData.length > 0 ? (
                 filteredData.map((row, index) => (
                   <tr key={index}>
-                    <td className="border px-4 py-2">{index + 1}</td>
-                    <td className="border px-4 py-2">{row.utr}</td>
-                    <td className="border px-4 py-2">{row.actionType}</td>
-                    <td className="border px-4 py-2">{row.amount}</td>
-                    <td className="border px-4 py-2">{row.bank}</td>
-                    <td className="border px-4 py-2">{row.date}</td>
-                    <td className="border px-4 py-2">{row.name}</td>
-                    <td className="border px-4 py-2">{row.remark}</td>
-                    <td className="border px-4 py-2">{row.site}</td>
+                    <td className="border border-gray-400  px-4 py-2">{index + 1}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.utr}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.actionType}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.amount}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.bank}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.date}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.name}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.remark}</td>
+                    <td className="border border-gray-400  px-4 py-2">{row.site}</td>
                   </tr>
                 ))
               ) : (
