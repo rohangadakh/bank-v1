@@ -19,7 +19,7 @@ const Deposit: React.FC<DepositProps> = ({ accessType }) => {
     bank: "",
     site: "",
     remark: "",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     actionType: "Deposit",
   });
 
